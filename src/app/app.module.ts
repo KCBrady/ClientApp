@@ -10,13 +10,15 @@ import { HomeComponent } from './home/home.component';
 import { AgGridModule } from 'ag-grid-angular';
 
 import { HttpClientModule } from '@angular/common/http';
+import { SearchPartiesComponent } from './search-parties/search-parties.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     CreditHoldReleaseComponent,
-    HomeComponent
+    HomeComponent,
+    SearchPartiesComponent
   ],
   imports: [
     BrowserModule,

@@ -1,6 +1,7 @@
 import { Injectable, Injector } from '@angular/core';
 // import { AccountService } from './account.service';
 import {CreditHoldReleaseService } from './credit-hold-release.service'
+import { SearchPartiesService } from './search-parties.service';
 // import { LoginService } from './login.service';
 // import { ProductsService } from './products.service';
 // import { SignUpService } from './sign-up.service';
@@ -24,6 +25,14 @@ export class FacadeService {
         this._creditHoldReleaseService = this.injector.get(CreditHoldReleaseService);
       }
       return this._creditHoldReleaseService;
+    }
+
+    private _searchPartiesService: SearchPartiesService | undefined
+    public get searchPartiesService(): SearchPartiesService {
+      if (!this._searchPartiesService) {
+        this._searchPartiesService = this.injector.get(SearchPartiesService);
+      }
+      return this._searchPartiesService;
     }
 
     //   private _loginService: LoginService;
@@ -63,6 +72,10 @@ export class FacadeService {
 
     getCreditHoldRelease(postData: any) {
       return this.creditHoldReleaseService.getCreditHoldRelease(postData);
+    }
+
+    getSearchPartiesList(postData: any) {
+      return this.searchPartiesService.getSearchPartiesList(postData);
     }
 
     //   isAuthenticated() {
