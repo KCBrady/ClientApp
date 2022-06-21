@@ -16,6 +16,12 @@
                             <label id="BusinessDate" class="" title="" cvalue="2022/02/11" ctable="" originalvalue="2022/02/11" ctype="date">02/11/2022</label>
                         </td>
                     </tr>
+                    <tr>
+                        <div style="margin-bottom: 5px;">
+                            <button (click)="refreshCache(undefined)">Refresh</button>
+                            <label><input type="checkbox" id="purge" /> Purge</label>
+                        </div>
+                    </tr>
                 </tbody></table>
             </td>
         </tr>
@@ -32,6 +38,7 @@
                        [defaultColDef]="defaultColDef"
                        [autoGroupColumnDef]="autoGroupColumnDef"                       
                        [serverSideStoreType]="serverSideStoreType"
+                       [enableCellChangeFlash]="true"
                        [cacheBlockSize]="cacheBlockSize"
                        [enableRangeSelection]="true"
                        [rowSelection]="rowSelection"
