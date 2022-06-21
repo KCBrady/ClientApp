@@ -3,10 +3,23 @@ import 'ag-grid-enterprise';
 import { Component, OnInit } from '@angular/core';
 
 import { FacadeService } from '../services/facade.service';
-import { GetRowIdFunc, GetRowIdParams, ServerSideStoreType } from 'ag-grid-enterprise';
-import { SearchPartiesModel } from '../models/search-parties.model';
-import { AsyncTransactionsFlushed, IsApplyServerSideTransactionParams, ServerSideTransactionResult, ServerSideTransactionResultStatus } from 'ag-grid-community';
 
+import { 
+        GridApi,
+        GetRowIdFunc, 
+        GetRowIdParams,
+        GridReadyEvent,
+        IServerSideDatasource,
+        ServerSideStoreType,
+        ToolPanelClass,
+        IToolPanel,
+        AsyncTransactionsFlushed, 
+        IsApplyServerSideTransactionParams, 
+        ServerSideTransactionResult, 
+        ServerSideTransactionResultStatus } from 'ag-grid-community';
+
+import { SearchPartiesModel } from '../models/search-parties.model';
+import { HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-serach-parties',
@@ -16,18 +29,22 @@ import { AsyncTransactionsFlushed, IsApplyServerSideTransactionParams, ServerSid
 export class SearchPartiesComponent implements OnInit {
   SearchPartiesList: Array<SearchPartiesModel> = [];
 
-  private gridApi: { setServerSideDatasource: (arg0: any) => void; } | undefined;
+  //private gridApi: { setServerSideDatasource: (arg0: any) => } | undefined;
+  private gridApi!: GridApi;
   private gridColumnApi: any;
 
   // this is not required as I'm using packages (not modules), see package.json
   //modules: Module[] = [];  
   
   public rowModelType: 'clientSide' | 'infinite' | 'viewport' | 'serverSide' = 'serverSide';
-  public serverSideStoreType: ServerSideStoreType = 'partial';
+  //public serverSideStoreType: ServerSideStoreType = 'partial';
+  public serverSideStoreType: ServerSideStoreType = 'full';
   public rowSelection = 'multiple';
   public rowData!: any[];
 
   public asyncTransactionWaitMillis = 500;
+
+  public versionCounter = 1;
   
   //rowModelType: any;
   //serverSideStoreType: any;
@@ -62,30 +79,30 @@ export class SearchPartiesComponent implements OnInit {
       { field: 'name', filter: 'agTextColumnFilter'},
       { field: 'rating', filter: 'agTextColumnFilter'},
       { field: 'creditAnalyst', filter: 'agTextColumnFilter'},
-      { field: 'secondCreditAnalyst', filter: 'agTextColumnFilter'},
-      { field: 'creditOffice', filter: 'agTextColumnFilter'},
-      { field: 'secondAnalystOffice', filter: 'agTextColumnFilter'},
+      { field: 'secondCreditAnalyst', filter: 'agTextColumnFilter', hide:true},
+      { field: 'creditOffice', filter: 'agTextColumnFilter', hide:true},
+      { field: 'secondAnalystOffice', filter: 'agTextColumnFilter', hide:true},
       { field: 'country', filter: 'agTextColumnFilter'},
-      { field: 'countryISO', filter: 'agTextColumnFilter'},
-      { field: 'riskCountry', filter: 'agTextColumnFilter'},
-      { field: 'riskCountryISO', filter: 'agTextColumnFilter'},
-      { field: 'limit', filter: 'agNumberColumnFilter'},
-      { field: 'exposure', filter: 'agNumberColumnFilter' },
-      { field: 'available', filter: 'agNumberColumnFilter' },
+      { field: 'countryISO', filter: 'agTextColumnFilter', hide:true},
+      { field: 'riskCountry', filter: 'agTextColumnFilter', hide:true},
+      { field: 'riskCountryISO', filter: 'agTextColumnFilter', hide:true},
+      { field: 'limit', filter: 'agNumberColumnFilter', hide:true},
+      { field: 'exposure', filter: 'agNumberColumnFilter'},
+      { field: 'available', filter: 'agNumberColumnFilter', hide:true },
       { field: 'utilisationPct',
                 filter: 'agTextColumnFilter', 
                 cellClassRules: {
                     'util-pct-alert': 'x.length > 3', }
               },
-      { field: 'category', filter: 'agTextColumnFilter'},
-      { field: 'region', filter: 'agTextColumnFilter'},
-      { field: 'riskRegion', filter: 'agTextColumnFilter'},
-      { field: 'industry', filter: 'agTextColumnFilter'},
-      { field: 'role', filter: 'agTextColumnFilter'},
-      { field: 'aliasType', filter: 'agTextColumnFilter'},
-      { field: 'alias', filter: 'agTextColumnFilter'},
-      { field: 'nextCreditAssesmentDate', filter: 'agDateColumnFilter'},
-      { field: 'lastCreditAssesmentDate', filter: 'agDateColumnFilter' },
+      { field: 'category', filter: 'agTextColumnFilter', hide:true},
+      { field: 'region', filter: 'agTextColumnFilter', hide:true},
+      { field: 'riskRegion', filter: 'agTextColumnFilter', hide:true},
+      { field: 'industry', filter: 'agTextColumnFilter', hide:true},
+      { field: 'role', filter: 'agTextColumnFilter', hide:true},
+      { field: 'aliasType', filter: 'agTextColumnFilter', hide:true},
+      { field: 'alias', filter: 'agTextColumnFilter', hide:true},
+      { field: 'nextCreditAssesmentDate', filter: 'agDateColumnFilter', hide:true},
+      { field: 'lastCreditAssesmentDate', filter: 'agDateColumnFilter', hide:true },
       { field: 'active', filter: 'agTextColumnFilter'},
       { field: 'status', filter: 'agTextColumnFilter'},
     ];
@@ -99,9 +116,6 @@ export class SearchPartiesComponent implements OnInit {
     };
 
     this.sideBar = 'filters';  
-    
-    
-    
 
    }
 
@@ -152,17 +166,31 @@ export class SearchPartiesComponent implements OnInit {
     return transactionCreatedSinceInitialLoad;
   }
 
+  refreshCache(route?: string[]) {
+    this.versionCounter++;
+    var purge =
+      (document.querySelector('#purge') as HTMLInputElement).checked === true;
+      
+    this.gridApi.refreshServerSideStore({ route: route, purge: purge });
+  }
+
   ngOnInit(): void {
   }
 
-  onGridReady(params: { api: { setServerSideDatasource: (arg0: any) => void; getToolPanelInstance: any}; columnApi: any; }) {
+  //onGridReady(params: { api: { setServerSideDatasource: (arg0: any) => void; getToolPanelInstance: any}; columnApi: any; }) {
+    onGridReady(params: GridReadyEvent) {
+    this.gridApi = params.api;
+    
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
 
     var datasource = this.createServerSideDatasource(this.facadeService);
+    
     params.api.setServerSideDatasource(datasource);
 
-    params.api.getToolPanelInstance('filters').expandFilters();
+    params.api.getToolPanelInstance('filters');
+
+    //params.api.getToolPanelInstance('filters').expandFilters();
 
     console.log(" On Grid Ready has been called.");
     //console.log(" GridAPI Datadource : " + this.gridApi.getServerSideDataSource);
@@ -225,4 +253,5 @@ export class SearchPartiesComponent implements OnInit {
       }
     }
   }
+  
 }
