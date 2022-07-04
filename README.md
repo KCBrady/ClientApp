@@ -6,6 +6,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 You will need to install the following modules
 
 `npm i mdb-angular-ui-kit`
+
 `npm install --save ag-grid-community ag-grid-angular ag-grid-enterprise`
 
 I use packages not modules so there is no need to install individual modules for ag grid.
@@ -21,7 +22,8 @@ Run `ng generate component component-name` to generate a new component. You can 
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-Run 'ng build --base-href "/ClientAngular/"' to build the project for deployment to localhost\ClientAngular.
+
+Run `ng build --base-href "/ClientAngular/"` to build the project for deployment to localhost\ClientAngular.
 
 ## Running unit tests
 
