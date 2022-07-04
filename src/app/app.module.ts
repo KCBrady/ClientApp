@@ -12,6 +12,8 @@ import { AgGridModule } from 'ag-grid-angular';
 import { HttpClientModule } from '@angular/common/http';
 import { SearchPartiesComponent } from './search-parties/search-parties.component';
 
+import { MdbCollapseModule } from 'mdb-angular-ui-kit/collapse';
+
 
 @NgModule({
   declarations: [
@@ -26,7 +28,8 @@ import { SearchPartiesComponent } from './search-parties/search-parties.componen
     BrowserAnimationsModule,
     AgGridModule.withComponents([]),
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    MdbCollapseModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
